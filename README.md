@@ -36,7 +36,9 @@ particle happens to be this one. Full derivation in [`docs/ROOT-CAUSE.md`](docs/
 
 ## The fix
 
-This mod ships the missing definition:
+Two layers, in this order of importance.
+
+**1. The missing asset (root-cause fix).** This mod ships the definition Alex's Caves omits:
 
 ```json
 { "textures": [ "alexscaves:raygun_blast" ] }
@@ -47,14 +49,20 @@ This mod ships the missing definition:
 both the minimal and the visually correct choice. The sprite set is populated before anything
 can spawn the particle, so the crash is fixed at its source **for every spawner**.
 
+**2. A factory guard (backstop).** `TremorzillaFactory.createParticle` is additionally guarded:
+if the sprite set cannot produce a sprite, it returns `null` before constructing anything, and
+vanilla skips that one particle instead of crashing. This is what saves the client if another
+resource pack overrides the definition, a later mod replaces it, or the asset is stripped from a
+repack. It applies only on Alex's Caves 2.0.x; on any other build it is skipped with one WARN.
+
 ## What this mod is not
 
-- **Not a rewrite of Alex's Caves.** No classes are replaced, no code is patched, no mixin is
-  used. It is one asset file plus a no-op mod entrypoint.
+- **Not a rewrite of Alex's Caves.** No code is replaced and nothing is repackaged. One asset
+  file, one small guard, one no-op mod entrypoint.
 - **Not a gameplay change.** Nothing about blocks, items, entities, damage or drops.
 - **Not something the server needs.** Registers nothing, opens no network channel, sends
-  nothing. A server without it accepts a patched client with no complaint, and patched and
-  unpatched players see identical gameplay.
+  nothing, and the guard never runs server-side. A server without it accepts a patched client
+  with no complaint, and patched and unpatched players see identical gameplay.
 
 ## Compatibility
 

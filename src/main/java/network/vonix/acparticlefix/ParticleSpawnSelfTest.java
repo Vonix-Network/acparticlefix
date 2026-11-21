@@ -75,6 +75,28 @@ public final class ParticleSpawnSelfTest {
     }
   }
 
+  /**
+   * Confirms the defence-in-depth guard is really present on the loaded factory class, rather
+   * than assuming the mixin applied. An absent guard must not be reported as working.
+   */
+  private static void verifyGuardApplied() {
+    final String target =
+        "com.github.alexmodguy.alexscaves.client.particle.RaygunBlastParticle$TremorzillaFactory";
+    try {
+      Class<?> factory = Class.forName(target);
+      for (var m : factory.getDeclaredMethods()) {
+        if (m.getName().contains("acparticlefix$skipUnboundSpriteSet")) {
+          LOG.info("[acparticlefix/selftest] GUARD=PASS factory guard present in {}", target);
+          return;
+        }
+      }
+      LOG.warn("[acparticlefix/selftest] GUARD=ABSENT {} loaded but carries no guard; "
+          + "the asset fix is still active, but the backstop is not.", target);
+    } catch (ClassNotFoundException e) {
+      LOG.error("[acparticlefix/selftest] GUARD=SKIPPED could not load {}", target);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private static void runCheck() throws Exception {
     Minecraft mc = Minecraft.getInstance();
@@ -83,6 +105,11 @@ public final class ParticleSpawnSelfTest {
       LOG.error("[acparticlefix/selftest] RESULT=SKIPPED particle engine not constructed yet");
       return;
     }
+
+    // Force-load the guard's target so the mixin is actually applied and can be inspected.
+    // Alex's Caves registers its particle providers lazily, so this class may never have been
+    // loaded at this point — in which case an absent guard proves nothing either way.
+    verifyGuardApplied();
 
     // ParticleEngine.spriteSets is the map of particle id -> MutableSpriteSet. Look it up by
     // its declared generic type rather than by name, so an unobfuscated name change cannot
@@ -113,10 +140,13 @@ public final class ParticleSpawnSelfTest {
       return;
     }
 
-    // Exactly what TextureSheetParticle.pickSprite ends up calling.
+    // Probe with get(RandomSource), not get(int,int): the latter computes
+    // age * (size-1) / lifetime, which is meaningless for a single sprite and throws
+    // ArithmeticException at lifetime 0 — which would have been misreported as "unbound".
+    // get(RandomSource) only dereferences the sprite list, so an NPE from it means unbound.
     try {
-      Object sprite = sprites.get(0, 1);
-      LOG.info("[acparticlefix/selftest] RESULT=PASS {} sprite set is bound (get(0,1) -> {}). "
+      Object sprite = sprites.get(net.minecraft.util.RandomSource.create());
+      LOG.info("[acparticlefix/selftest] RESULT=PASS {} sprite set is bound (get(random) -> {}). "
           + "The crash path cannot throw. FIX IS IN EFFECT.", TARGET, sprite);
     } catch (Throwable t) {
       LOG.error("[acparticlefix/selftest] RESULT=FAIL {} sprite set is UNBOUND: {}: {}. "

@@ -60,6 +60,9 @@ dependencies {
     // Exact Alex's Caves (Unofficial Port) pin. compileOnly: the released jar never
     // bundles third-party code.
     compileOnly "maven.modrinth:alexs-caves-unofficial-port:${alexscaves_version}"
+
+    // Mixin, for the defence-in-depth factory guard.
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 // The Alex's Caves jar is only needed at compile time; a missing pin must fail loudly
@@ -108,6 +111,8 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_authors,
+                // Tells FML/mixin which config to load for the factory guard.
+                'MixinConfigs'          : "${mod_id}.mixins.json",
         ])
     }
 }

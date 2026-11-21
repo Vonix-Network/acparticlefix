@@ -11,6 +11,11 @@ All notable changes to Alex's Caves Particle Crash Fix.
   null`). The mod supplies the particle definition that Alex's Caves (Unofficial Port) omits,
   binding the particle to the existing `raygun_blast` texture. The crash is fixed at its
   source, for every spawner.
+- **Factory guard (backstop).** `RaygunBlastParticle$TremorzillaFactory.createParticle` returns
+  `null` when the sprite set cannot produce a sprite, so vanilla skips the particle instead of
+  throwing. Protects against a resource pack or mod replacing the definition, or the asset being
+  stripped from a repack. Applies only on Alex's Caves 2.0.x; skipped with one WARN elsewhere.
+  Never runs server-side.
 
 ### Notes
 

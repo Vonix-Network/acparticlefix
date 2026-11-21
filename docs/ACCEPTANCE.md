@@ -29,7 +29,7 @@ Same client, patch asset restored, build tree cleaned:
 
 ```
 [acparticlefix/selftest] RESULT=PASS alexscaves:tremorzilla_blast sprite set is bound
-(get(0,1) -> TextureAtlasSprite{contents='SpriteContents{name=alexscaves:raygun_blast,
+(get(random) -> TextureAtlasSprite{contents='SpriteContents{name=alexscaves:raygun_blast,
 frameCount=1, height=16, width=16}', u0=0.578125, ...}).
 The crash path cannot throw. FIX IS IN EFFECT.
 ```
@@ -40,6 +40,29 @@ it.
 
 **Gates 1 and 2 together are the proof:** one variable changed (the asset present or absent),
 the reported failure flips to a pass.
+
+> The probe deliberately uses `SpriteSet.get(RandomSource)`, not `get(int, int)`.
+> `get(int, int)` computes `age * (size - 1) / lifetime` — meaningless for a single sprite and an
+> `ArithmeticException` at lifetime 0, which would have been misreported as "unbound".
+
+## Gate 2b — the factory guard (second layer)
+
+The mod also guards `RaygunBlastParticle$TremorzillaFactory.createParticle` so an unbound sprite
+set returns `null` (vanilla skips the particle) instead of constructing a particle that throws.
+Verified present and independently useful:
+
+```
+GUARD=PASS factory guard present in ...RaygunBlastParticle$TremorzillaFactory
+```
+
+With the asset removed but the guard in place, the sprite set is still unbound
+(`RESULT=FAIL … this.sprites is null`) yet **the client does not crash** — the guard returns
+`null` before the particle is constructed. So the two layers are independently effective:
+the asset fixes the source, the guard stops any residual path from becoming a crash.
+
+The guard is skipped on any Alex's Caves build outside 2.0.x, with one WARN, leaving the mod's
+asset fix as the only active layer. It also never runs on a dedicated server.
+
 
 ## Gate 3 — absence test: mod present, Alex's Caves absent
 

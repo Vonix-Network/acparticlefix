@@ -27,6 +27,10 @@ is that a patched client does not crash.
 If Alex's Caves (Unofficial Port) is not installed, or a future build ships its own definition
 for this particle, this mod is inert.'''
 
+## Mixin config. On NeoForge 1.21.1 this is declared here, not in the jar manifest.
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
 [[dependencies.acparticlefix]]
 modId = "neoforge"
 type = "required"

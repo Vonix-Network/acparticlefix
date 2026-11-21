@@ -31,10 +31,14 @@ one: `tremorzilla_blast` is the scaled-up version of that same sprite. The sprit
 before anything can spawn the particle, so the crash is fixed at its source, for **every**
 spawner — not just the one that crashed you.
 
+As a backstop, the mod also makes that one particle factory return "nothing to draw" instead of
+throwing if its sprites are ever missing again — for example if another resource pack overrides
+the definition. You get one missing particle instead of a crash.
+
 ### What it is not
 
-- Not a rewrite of Alex's Caves. No code is patched, no classes replaced, no mixin used. It is
-  one asset file.
+- Not a rewrite of Alex's Caves. Nothing is repackaged; it is one asset file plus a small guard
+  on a single factory method.
 - Not a gameplay change. Blocks, items, entities, damage, drops: untouched.
 - Not something a server needs. It registers nothing, opens no network connection, and sends
   nothing. A server without it accepts you with no complaint, and players with and without the

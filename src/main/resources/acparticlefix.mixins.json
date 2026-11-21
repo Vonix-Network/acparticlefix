@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "network.vonix.acparticlefix.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "network.vonix.acparticlefix.mixin.AcParticleFixMixinPlugin",
+  "client": [
+    "TremorzillaFactoryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
