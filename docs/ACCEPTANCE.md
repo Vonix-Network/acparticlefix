@@ -109,6 +109,22 @@ contents: AlexsCavesParticleFix.class, ParticleSpawnSelfTest.class,
 No `MixinConfigs` manifest entry (correct — this mod has no mixins). No third-party classes
 bundled. Alex's Caves is `compileOnly`.
 
+## Gate 6 — version sweep (both layers on Alex's Caves 2.0.10)
+
+The handoff asked for the sweep against the port's newer build. Alex's Caves 2.0.10 swapped in
+for 2.0.4, same patch jar:
+
+```
+Alex's Caves 2.0.10
+GUARD=PASS factory guard present in ...RaygunBlastParticle$TremorzillaFactory
+RESULT=PASS alexscaves:tremorzilla_blast sprite set is bound (get(random) ->
+TextureAtlasSprite{name=alexscaves:raygun_blast, ...}). FIX IS IN EFFECT.
+```
+
+Both layers work on 2.0.10 exactly as on 2.0.4, which matches the jar-level finding: the factory
+class is byte-identical (`889150a6…`) across the whole 2.0.x line and no build ships the missing
+definition. The patch is therefore correct-and-needed on both, not merely tolerated on 2.0.10.
+
 ---
 
 ## What was NOT tested, and why
@@ -121,9 +137,9 @@ bundled. Alex's Caves is `compileOnly`.
 - **A real Infinite Dimensions generated dimension.** Would need the pack plus that mod; the
   crash condition was reproduced directly instead, which is stronger because it isolates the
   single variable.
-- **Version sweep against 2.0.10 at runtime.** Not needed for correctness: the factory class
-  is byte-identical (`889150a6…`) and 2.0.10 ships no `tremorzilla_blast.json`, so the same
-  gate result applies. The jar-level check is in `docs/ROOT-CAUSE.md`.
+- ~~Version sweep against 2.0.10 at runtime.~~ Done — see Gate 6. 2.0.5–2.0.9 were not run
+  individually: the factory class is byte-identical across the line and none ships the
+  definition, so there is no build in that range where the result could differ.
 - **A "fix on top of the fixed fork" run.** The fork does not exist as a released build yet.
   Design argument instead: if Alex's Caves ever ships its own
   `tremorzilla_blast.json`, that file is in the mod's own pack, which takes precedence over
