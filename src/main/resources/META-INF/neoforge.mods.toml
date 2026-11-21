@@ -1,0 +1,49 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+issueTrackerURL = "https://github.com/Vonix-Network/alexscaves-particle-fix/issues"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''Client-side fix for a crash caused by the Alex's Caves particle `alexscaves:tremorzilla_blast`.
+
+Alex's Caves (Unofficial Port) registers `tremorzilla_blast` as a particle and registers a
+client provider for it, but ships no particle definition file for it. Vanilla only supplies a
+particle's sprites when such a file exists, so this particle's sprite set stays null. The first
+time anything spawns `tremorzilla_blast` the client throws:
+
+    NullPointerException: Cannot invoke "java.util.List.size()" because "this.sprites" is null
+
+This mod supplies that missing definition, binding the particle to the `raygun_blast` texture
+already used by its sibling particle. The crash is fixed at its source, for every spawner.
+
+Client only. Registers nothing, opens no network channel, sends nothing, changes no gameplay.
+Players with and without it can share a server with no visible difference; the only difference
+is that a patched client does not crash.
+
+If Alex's Caves (Unofficial Port) is not installed, or a future build ships its own definition
+for this particle, this mod is inert.'''
+
+[[dependencies.acparticlefix]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.acparticlefix]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.acparticlefix]]
+modId = "alexscaves"
+type = "optional"
+versionRange = "[2.0,3.0)"
+ordering = "AFTER"
+side = "CLIENT"

@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+out/
+bin/
+*.class
+
+# IDE
+.idea/
+*.iml
+.ipr
+.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# Minecraft run directories — never commit worlds, logs, or downloaded mods
+run/
+run-*/
+runs/
+logs/
+crash-reports/
+world/
+saves/
+resourcepacks/
+options.txt
+eula.txt
+server.properties
+mods/
+
+# Local notes
+*.local

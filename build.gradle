@@ -1,0 +1,117 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = "${minecraft_version}-${mod_version}"
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    // Fail the build if the pinned NeoForge cannot be resolved.
+    validateAccessTransformers = true
+
+    runs {
+        client {
+            client()
+            // Headless CI: real rendering only when a display is available.
+            gameDirectory = project.file('run-client')
+            // Forward the opt-in self-test flag into the forked game JVM. A -D on the
+            // gradlew command line does NOT reach the client process.
+            if (project.hasProperty('acselftest')) {
+                jvmArgument "-Dacparticlefix.selftest=${project.property('acselftest')}"
+            }
+            // Optional quick-join, used by the multiplayer acceptance gate.
+            if (project.hasProperty('acjoin')) {
+                programArgument "--quickPlayMultiplayer"
+                programArgument "${project.property('acjoin')}"
+            }
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            gameDirectory = project.file('run-server')
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+}
+
+dependencies {
+    // Exact Alex's Caves (Unofficial Port) pin. compileOnly: the released jar never
+    // bundles third-party code.
+    compileOnly "maven.modrinth:alexs-caves-unofficial-port:${alexscaves_version}"
+}
+
+// The Alex's Caves jar is only needed at compile time; a missing pin must fail loudly
+// rather than produce a jar that patches nothing.
+tasks.register('verifyAlexsCavesPin') {
+    doLast {
+        def found = configurations.getByName('compileClasspath').resolvedConfiguration
+                .resolvedArtifacts.find {
+            it.moduleVersion.id.group == 'maven.modrinth'
+                    && it.moduleVersion.id.name == 'alexs-caves-unofficial-port'
+        }
+        if (found == null) {
+            throw new GradleException("Pinned Alex's Caves ${alexscaves_version} not resolved; refusing to build.")
+        }
+        logger.lifecycle("Alex's Caves pin OK: ${found.moduleVersion.id} (${found.file.name})")
+    }
+}
+tasks.named('compileJava') { dependsOn 'verifyAlexsCavesPin' }
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            alexscaves_version     : alexscaves_version,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'   : mod_id,
+                'Specification-Vendor'  : mod_authors,
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Vendor' : mod_authors,
+        ])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
