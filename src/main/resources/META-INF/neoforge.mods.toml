@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
 license = "${mod_license}"
-issueTrackerURL = "https://github.com/Vonix-Network/alexscaves-particle-fix/issues"
+issueTrackerURL = "https://github.com/Vonix-Network/acparticlefix/issues"
 
 [[mods]]
 modId = "${mod_id}"

@@ -1,0 +1,1 @@
+Client-side fix for an Alex's Caves (Unofficial Port) crash that locks players out of their world on 1.21.1. No server install, no gameplay change.

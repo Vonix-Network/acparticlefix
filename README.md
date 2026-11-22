@@ -1,9 +1,10 @@
-# Alex's Caves Particle Crash Fix
+# Alex's Caves: Tremorzilla Crash Fix
 
-A tiny **client-only** mod that stops a crash caused by one Alex's Caves particle, so a player
-can fix it on their own client without the server changing anything.
+A tiny **client-only** mod that stops a crash caused by one [Alex's Caves (Unofficial
+Port)](https://www.curseforge.com/minecraft/mc-mods/alexs-caves-unofficial-port) particle, so a
+player can fix it on their own client without the server changing anything.
 
-Minecraft **1.21.1** · NeoForge · Alex's Caves (Unofficial Port) **2.0.x**
+Minecraft **1.21.1** · NeoForge · Alex's Caves (Unofficial Port) **2.0.x** · **client-side only**
 
 ---
 

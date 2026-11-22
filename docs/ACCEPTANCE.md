@@ -98,16 +98,25 @@ mod is not needed anywhere server-side.
 
 ## Gate 5 — artifact identity
 
+The published `v1.21.1-1.0.0` artifact, as downloadable from the release:
+
 ```
-curiosperf-style build:  ./gradlew build
-acparticlefix-1.21.1-1.0.0.jar
-sha256 83f218d3a244720c11a269e7402c43c3fab0d7439038876f8896474cdde40774
+acparticlefix-1.21.1-1.0.0.jar   11,328 bytes
+sha256 39cd6fd3da6322a024af3f38b56e51f5ef1721433835d06be8a699fba454381d
 contents: AlexsCavesParticleFix.class, ParticleSpawnSelfTest.class,
-          assets/alexscaves/particles/tremorzilla_blast.json
+          mixin/AcParticleFixMixinPlugin.class, mixin/TremorzillaFactoryMixin.class,
+          mixin/TremorzillaFactoryMixin$AcParticleFixSprites.class,
+          assets/alexscaves/particles/tremorzilla_blast.json,
+          acparticlefix.mixins.json, pack.mcmeta
 ```
 
-No `MixinConfigs` manifest entry (correct — this mod has no mixins). No third-party classes
-bundled. Alex's Caves is `compileOnly`.
+No third-party classes are bundled; Alex's Caves is `compileOnly` and is never shipped. The mixin
+config is declared in `neoforge.mods.toml` (`[[mixins]] config = "acparticlefix.mixins.json"`), which
+is the correct location on NeoForge 1.21.1 rather than the jar manifest.
+
+> Earlier drafts of this document recorded `sha256 83f218d3…` and "this mod has no mixins" — both
+> described the asset-only build that existed before the factory guard layer was added in `24b53f7`.
+> The values above are the current, published artifact.
 
 ## Gate 6 — version sweep (both layers on Alex's Caves 2.0.10)
 
